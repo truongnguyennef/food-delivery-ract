@@ -21,6 +21,7 @@ module.exports = {
         'gray-dark': '#273444',
         'gray': '#8492a6',
         'gray-light': '#d3dce6',
+        'rowBg': 'rgba(255,131,0,0.05)',
       },
       fontFamily: {
         sans: ['Graphik', 'sans-serif'],
@@ -28,5 +29,7 @@ module.exports = {
       },  
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar'),
+  ],
 }
