@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { MdOutlineKeyboardBackspace } from 'react-icons/md'
 import {RiRefreshFill} from 'react-icons/ri'
 
@@ -11,14 +11,33 @@ import CartItem from './CartItem'
 const CartContainer = () => {
 
     const [{ cartShow, cartItems, user }, dispatch] = useStateValue();
+    const [flag, setFlag] = useState(1);
+    const [tot, setTot] = useState(0);
 
     const showCart = () => {
         dispatch({
             type : actionType.SET_CART_SHOW,
             cartShow : !cartShow,
         });
-    }
+    };
 
+    useEffect(() => {
+        let totalPrice = cartItems.reduce(function (accumulator, item){
+            return accumulator + item.qty * item.price;
+        }, 0);
+        setTot(totalPrice);
+        console.log(tot);
+    },[tot, flag ]);
+
+    const cleartCart = () => {
+        dispatch({
+            type: actionType.SET_CARTITEMS,
+            cartItems: [],
+        });
+        
+        localStorage.setItem("cartItems", JSON.stringify([]))
+    }
+    
   return (
     <motion.div 
         initial={{opacity : 0, x : 200}}
@@ -33,7 +52,7 @@ const CartContainer = () => {
             </motion.div>
             <p className='text-zinc-700 text-lg font-semibold'>Cart</p>
             <motion.p 
-                whileTap={{scale : 0.75}}
+                whileTap={{scale : 0.75}} onClick={cleartCart}
                 className='flex items-center gap-2 p-1 px-2 my-2 bg-slate-100
                  rounded-md hover:shadow-md cursor-pointer text-zinc-700 text-base'>
                     Clear <RiRefreshFill /> {''}
@@ -48,7 +67,8 @@ const CartContainer = () => {
                  {/* cart Item */}
                  {
                      cartItems && cartItems.map(item => (
-                        <CartItem key={item.id} item={item} />
+                        <CartItem key={item.id} item={item} setFlag={setFlag}
+                        flag={flag} />
                      ))
                  }
              </div>
@@ -57,19 +77,19 @@ const CartContainer = () => {
              <div className='w-full flex-1 bg-cartTotal rounded-t-[2rem] flex flex-col items-center
              justify-evenly px-8 py-2'>
                  <div className='w-full flex items-center justify-between'>
-                     <p className='text-gray text-lg'>Sub Total</p>
-                     <p className='text-gray text-lg'>￥800</p>
+                     <p className='text-gray text-lg'>小計</p>
+                     <p className='text-gray text-lg'>¥ {tot}</p>
                  </div>
                  <div className='w-full flex items-center justify-between'>
-                     <p className='text-gray text-lg'>Delivery</p>
-                     <p className='text-gray text-lg'>￥300</p>
+                     <p className='text-gray text-lg'>配達料金</p>
+                     <p className='text-gray text-lg'>¥ 300</p>
                  </div>
  
                  <div className='w-full border-b border-gray my-2'></div>
  
                  <div className='w-full flex items-center justify-between'>
-                     <p className='text-gray text-xl font-semibold'>Total</p>
-                     <p className='text-gray text-xl font-semibold'>￥1100</p>
+                     <p className='text-gray text-xl font-semibold'>合計</p>
+                     <p className='text-gray text-xl font-semibold'>¥ {tot + 300}</p>
                  </div>
                  
                  {user ? (
@@ -79,7 +99,7 @@ const CartContainer = () => {
                     className='w-full p-2 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-gray text-lg my-2
                     hover:shadow-lg'
                     >
-                        Check Out
+                        注文
                     </motion.button>
                  ) : (
                     <motion.button
@@ -88,7 +108,7 @@ const CartContainer = () => {
                     className='w-full p-2 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-gray text-lg my-2
                     hover:shadow-lg'
                     >
-                        Login To Check Out
+                        ログインして注文
                     </motion.button>
                  )}
              </div>
@@ -96,7 +116,7 @@ const CartContainer = () => {
         ) : (
             <div className='w-full h-full flex flex-col items-center justify-center gap-6'>
                 <img src={EmptyCart} className='w-72' alt="" />
-                <p className='text-xl text-zinc-700 font-semibold'>Add some items to your cart</p>
+                <p className='text-xl text-zinc-700 font-semibold'>カートに商品を追加する</p>
             </div>
         )}
        
